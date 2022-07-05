@@ -7,14 +7,13 @@ class JWT
     private static array $payload;
         
     /**
-     * This method generate a JWT token
-     * @param array $header specification of header, example :['alg' => 'sha256', 'typ' => 'JWT']
+     * This method generate a JWT token     
      * @param array $payload the payload
      * @param string|bool $exp expiration time in seconds or false if not expiration time is set.
      * 
      * @return string JWT Token
      */
-    public static function generate(array $header, array $payload, string|bool $exp) :string
+    public static function generate(array $payload, string|bool $exp) :string
     {
         
         // Add expiration to payload 
@@ -23,8 +22,11 @@ class JWT
             $expiration = $now->getTimestamp() + $exp;
             $payload['iat'] = $now->getTimestamp();
             $payload['exp'] = $expiration;
-        }       
-        
+        }
+
+        // set the JWT header
+        $header = ['alg' => 'sha256', 'typ' => 'JWT'];
+
         // Encode Base64
         $base64Header = base64_encode(json_encode($header));
         $base64Payload = base64_encode(json_encode($payload));
@@ -61,16 +63,16 @@ class JWT
      * @return true||false, true if the token is valid
      */
     private static function checkToken(string $token) :bool
-    {
-        $header = self::getHeader($token);
+    {        
         $payload = self::getPayload($token);
         
-        $check_token = self::generate($header, $payload, false);
+        $check_token = self::generate($payload, false);
 
         return $token === $check_token;
     }
     /**
      * Get the Token's Header
+     * This methods is not use because in this first version the the header can't be modified
      * @param string $token JWT Token
      * @return array header
      */
